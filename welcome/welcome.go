@@ -57,9 +57,6 @@ func DrawWelcome(renderer *sdl.Renderer) error {
 	}
 
 	err = renderer.Copy(startTexture, nil, &startRect)
-	if err != nil {
-		return err
-	}
 
 	return err
 }

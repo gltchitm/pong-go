@@ -65,6 +65,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	keyboardState := keyboardState{
 		w:    keyboardStateInactive,
 		s:    keyboardStateInactive,
@@ -75,7 +76,11 @@ func main() {
 	started := false
 	ticksUntilStart := consts.TicksUntilStart
 
-	ball := ball.NewBall(renderer)
+	ball, err := ball.NewBall(renderer)
+	if err != nil {
+		panic(err)
+	}
+
 	paddles := paddles.NewPaddles(renderer)
 	scoreboard := scoreboard.NewScoreboard(renderer)
 
@@ -83,7 +88,10 @@ game:
 	for {
 		tickStart := time.Now()
 
-		renderer.Clear()
+		err = renderer.Clear()
+		if err != nil {
+			panic(err)
+		}
 
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 			switch event := event.(type) {
@@ -176,7 +184,10 @@ game:
 			if ticksUntilStart > 0 {
 				for _, arrowTickRange := range consts.ArrowTickRanges {
 					if ticksUntilStart > arrowTickRange[0] && ticksUntilStart < arrowTickRange[1] {
-						ball.DrawArrow()
+						err = ball.DrawArrow()
+						if err != nil {
+							panic(err)
+						}
 					}
 				}
 
@@ -189,12 +200,18 @@ game:
 			if ball.X < consts.WindowPadding+consts.BallRadius {
 				scoreboard.RightScore++
 				ball.Center()
-				ball.RandomizeVelocity()
+				err = ball.RandomizeVelocity()
+				if err != nil {
+					panic(err)
+				}
 				ticksUntilStart = consts.TicksUntilStart
 			} else if ball.X > consts.WindowWidth-consts.WindowPadding-consts.BallRadius {
 				scoreboard.LeftScore++
 				ball.Center()
-				ball.RandomizeVelocity()
+				err = ball.RandomizeVelocity()
+				if err != nil {
+					panic(err)
+				}
 				ticksUntilStart = consts.TicksUntilStart
 			}
 
@@ -219,25 +236,47 @@ game:
 				ball.XVelocity *= -1
 			}
 
-			renderer.SetDrawColor(
+			err = renderer.SetDrawColor(
 				consts.ForegroundR,
 				consts.ForegroundG,
 				consts.ForegroundB,
 				consts.ForegroundA,
 			)
-			renderer.DrawLine(consts.WindowWidth/2, 0, consts.WindowWidth/2, consts.WindowHeight)
-			renderer.SetDrawColor(
+			if err != nil {
+				panic(err)
+			}
+
+			err = renderer.DrawLine(consts.WindowWidth/2, 0, consts.WindowWidth/2, consts.WindowHeight)
+			if err != nil {
+				panic(err)
+			}
+
+			err = renderer.SetDrawColor(
 				consts.BackgroundR,
 				consts.BackgroundG,
 				consts.BackgroundB,
 				consts.BackgroundA,
 			)
+			if err != nil {
+				panic(err)
+			}
 
-			ball.Draw()
-			paddles.Draw()
-			scoreboard.Draw()
+			err = ball.Draw()
+			if err != nil {
+				panic(err)
+			}
+
+			err = paddles.Draw()
+			if err != nil {
+				panic(err)
+			}
+
+			err = scoreboard.Draw()
+			if err != nil {
+				panic(err)
+			}
 		} else {
-			err := welcome.DrawWelcome(renderer)
+			err = welcome.DrawWelcome(renderer)
 			if err != nil {
 				panic(err)
 			}

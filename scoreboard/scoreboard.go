@@ -74,9 +74,6 @@ func (scoreboard *Scoreboard) Draw() error {
 	}
 
 	err = scoreboard.renderer.Copy(rightScoreTexture, nil, &rightScoreRect)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }

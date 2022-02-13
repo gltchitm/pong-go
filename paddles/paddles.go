@@ -24,29 +24,45 @@ func NewPaddles(renderer *sdl.Renderer) *Paddles {
 func drawPaddle(x, y int, renderer *sdl.Renderer) error {
 	rect := sdl.Rect{X: int32(x), Y: int32(y), W: consts.PaddleWidth, H: consts.PaddleHeight}
 
-	renderer.SetDrawColor(
+	err := renderer.SetDrawColor(
 		consts.ForegroundR,
 		consts.ForegroundG,
 		consts.ForegroundB,
 		consts.ForegroundA,
 	)
-	renderer.FillRect(&rect)
-	renderer.SetDrawColor(
+	if err != nil {
+		return err
+	}
+
+	err = renderer.FillRect(&rect)
+	if err != nil {
+		return err
+	}
+
+	err = renderer.SetDrawColor(
 		consts.BackgroundR,
 		consts.BackgroundG,
 		consts.BackgroundB,
 		consts.BackgroundA,
 	)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (paddles *Paddles) Draw() {
-	drawPaddle(consts.WindowPadding, paddles.LeftY, paddles.renderer)
+func (paddles *Paddles) Draw() error {
+	err := drawPaddle(consts.WindowPadding, paddles.LeftY, paddles.renderer)
+	if err != nil {
+		return err
+	}
 
-	drawPaddle(
+	err = drawPaddle(
 		int(consts.WindowWidth-consts.WindowPadding-consts.PaddleWidth),
 		paddles.RightY,
 		paddles.renderer,
 	)
+
+	return err
 }

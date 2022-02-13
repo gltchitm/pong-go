@@ -16,7 +16,7 @@ type Ball struct {
 	renderer  *sdl.Renderer
 }
 
-func NewBall(renderer *sdl.Renderer) *Ball {
+func NewBall(renderer *sdl.Renderer) (*Ball, error) {
 	ball := Ball{
 		X:         0,
 		Y:         0,
@@ -26,9 +26,9 @@ func NewBall(renderer *sdl.Renderer) *Ball {
 	}
 
 	ball.Center()
-	ball.RandomizeVelocity()
+	err := ball.RandomizeVelocity()
 
-	return &ball
+	return &ball, err
 }
 
 func (ball *Ball) Center() {
@@ -62,13 +62,16 @@ func (ball *Ball) RandomizeVelocity() error {
 	return nil
 }
 
-func (ball *Ball) Draw() {
-	ball.renderer.SetDrawColor(
+func (ball *Ball) Draw() error {
+	err := ball.renderer.SetDrawColor(
 		consts.ForegroundR,
 		consts.ForegroundG,
 		consts.ForegroundB,
 		consts.ForegroundA,
 	)
+	if err != nil {
+		return err
+	}
 
 	for w := 0; w < consts.BallRadius*2; w++ {
 		for h := 0; h < consts.BallRadius*2; h++ {
@@ -76,111 +79,163 @@ func (ball *Ball) Draw() {
 			dy := consts.BallRadius - h
 
 			if dx*dx+dy*dy <= consts.BallRadius*consts.BallRadius {
-				ball.renderer.DrawPoint(int32(ball.X+dx), int32(ball.Y+dy))
+				err = ball.renderer.DrawPoint(int32(ball.X+dx), int32(ball.Y+dy))
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
 
-	ball.renderer.SetDrawColor(
+	err = ball.renderer.SetDrawColor(
 		consts.BackgroundR,
 		consts.BackgroundG,
 		consts.BackgroundB,
 		consts.BackgroundA,
 	)
+
+	return err
 }
 
 func (ball *Ball) DrawArrow() error {
-	ball.renderer.SetDrawColor(
+	err := ball.renderer.SetDrawColor(
 		consts.ForegroundR,
 		consts.ForegroundG,
 		consts.ForegroundB,
 		consts.ForegroundA,
 	)
-
-	if ball.XVelocity > 0 && ball.YVelocity < 0 {
-		ball.renderer.DrawLine(
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-		)
-		ball.renderer.DrawLine(
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-		)
-		ball.renderer.DrawLine(
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-		)
-	} else if ball.XVelocity > 0 && ball.YVelocity > 0 {
-		ball.renderer.DrawLine(
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-		)
-		ball.renderer.DrawLine(
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-		)
-		ball.renderer.DrawLine(
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-		)
-	} else if ball.XVelocity < 0 && ball.YVelocity > 0 {
-		ball.renderer.DrawLine(
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-		)
-		ball.renderer.DrawLine(
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-		)
-		ball.renderer.DrawLine(
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
-		)
-	} else if ball.XVelocity < 0 && ball.YVelocity < 0 {
-		ball.renderer.DrawLine(
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-		)
-		ball.renderer.DrawLine(
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-		)
-		ball.renderer.DrawLine(
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
-		)
+	if err != nil {
+		return err
 	}
 
-	ball.renderer.SetDrawColor(
+	if ball.XVelocity > 0 && ball.YVelocity < 0 {
+		err = ball.renderer.DrawLine(
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+		)
+		if err != nil {
+			return err
+		}
+
+		err = ball.renderer.DrawLine(
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+		)
+		if err != nil {
+			return err
+		}
+
+		err = ball.renderer.DrawLine(
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+		)
+		if err != nil {
+			return err
+		}
+	} else if ball.XVelocity > 0 && ball.YVelocity > 0 {
+		err = ball.renderer.DrawLine(
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+		)
+		if err != nil {
+			return err
+		}
+
+		err = ball.renderer.DrawLine(
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+		)
+		if err != nil {
+			return err
+		}
+
+		err = ball.renderer.DrawLine(
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+		)
+		if err != nil {
+			return err
+		}
+	} else if ball.XVelocity < 0 && ball.YVelocity > 0 {
+		err = ball.renderer.DrawLine(
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+		)
+		if err != nil {
+			return err
+		}
+		err = ball.renderer.DrawLine(
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+		)
+
+		if err != nil {
+			return err
+		}
+
+		err = ball.renderer.DrawLine(
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2+consts.BallRadius+consts.ArrowLength,
+		)
+		if err != nil {
+			return err
+		}
+	} else if ball.XVelocity < 0 && ball.YVelocity < 0 {
+		err = ball.renderer.DrawLine(
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+		)
+		if err != nil {
+			return err
+		}
+
+		err = ball.renderer.DrawLine(
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+		)
+		if err != nil {
+			return err
+		}
+
+		err = ball.renderer.DrawLine(
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+			consts.WindowWidth/2-consts.BallRadius/2-consts.BallRadius-consts.ArrowLength,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = ball.renderer.SetDrawColor(
 		consts.BackgroundR,
 		consts.BackgroundG,
 		consts.BackgroundB,
 		consts.BackgroundA,
 	)
 
-	return nil
+	return err
 }
