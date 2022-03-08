@@ -34,6 +34,19 @@ func clamp(value, min, max int) int {
 
 	return value
 }
+
+func initGame(renderer *sdl.Renderer) (*ball.Ball, *paddles.Paddles, *scoreboard.Scoreboard, error) {
+	ball, err := ball.NewBall(renderer)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	paddles := paddles.NewPaddles(renderer)
+	scoreboard := scoreboard.NewScoreboard(renderer)
+
+	return ball, paddles, scoreboard, nil
+}
+
 func main() {
 	err := sdl.Init(sdl.INIT_EVERYTHING)
 	if err != nil {
@@ -76,13 +89,10 @@ func main() {
 	started := false
 	ticksUntilStart := consts.TicksUntilStart
 
-	ball, err := ball.NewBall(renderer)
+	ball, paddles, scoreboard, err := initGame(renderer)
 	if err != nil {
 		panic(err)
 	}
-
-	paddles := paddles.NewPaddles(renderer)
-	scoreboard := scoreboard.NewScoreboard(renderer)
 
 game:
 	for {
@@ -122,6 +132,12 @@ game:
 							keyboardState.up = keyboardStateBackground
 						}
 						keyboardState.down = keyboardStateActive
+					case sdl.SCANCODE_ESCAPE:
+						ball, paddles, scoreboard, err = initGame(renderer)
+						if err != nil {
+							panic(err)
+						}
+						started = false
 					}
 				} else if event.Type == sdl.KEYUP {
 					switch event.Keysym.Scancode {
