@@ -55,6 +55,8 @@ func main() {
 
 	defer sdl.Quit()
 
+	sdl.SetHint(sdl.HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0")
+
 	window, err := sdl.CreateWindow(
 		consts.Title,
 		sdl.WINDOWPOS_CENTERED,
