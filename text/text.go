@@ -1,10 +1,14 @@
 package text
 
 import (
-	"github.com/gltchitm/pong-go/consts"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
+
+	_ "embed"
 )
+
+//go:embed font/font.ttf
+var fontData []byte
 
 func Text(
 	fontSize int,
@@ -12,7 +16,12 @@ func Text(
 	message string,
 	renderer *sdl.Renderer,
 ) (*sdl.Surface, *sdl.Texture, error) {
-	font, err := ttf.OpenFont(consts.FontPath, fontSize)
+	rw, err := sdl.RWFromMem(fontData)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	font, err := ttf.OpenFontRW(rw, 1, fontSize)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -4,8 +4,6 @@ const (
 	Title        = "Pong Go"
 	SpaceToStart = "Press SPACE To Start!"
 
-	FontPath = "./assets/font/font.ttf"
-
 	TitleFontSize            = 64
 	PressToStartFontSize     = 24
 	TitlePressToStartPadding = 30
